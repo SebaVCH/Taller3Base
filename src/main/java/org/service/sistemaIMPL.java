@@ -190,7 +190,7 @@ public class sistemaIMPL implements sistema{
     }
 
     @Override
-    public void realizarDeposito() {
+    public void realizarDeposito(String email) {
 
         System.out.println("Ingrese el ID de la cuenta para realizar el depósito:");
         int idCuenta = Integer.parseInt(sc.nextLine());
@@ -230,7 +230,7 @@ public class sistemaIMPL implements sistema{
     }
 
     @Override
-    public void realizarRetiro() {
+    public void realizarRetiro(String email) {
         System.out.println("Ingrese el ID de la cuenta para realizar el retiro:");
         int idCuenta = Integer.parseInt(sc.nextLine());
         System.out.println("Ingrese el monto a retirar:");
@@ -283,7 +283,7 @@ public class sistemaIMPL implements sistema{
     }
 
     @Override
-    public void realizarTransferencia() {
+    public void realizarTransferencia(String email) {
         System.out.println("Ingrese el ID de la cuenta de origen:");
         int idCuentaOrigen = Integer.parseInt(sc.nextLine());
         System.out.println("Ingrese el ID de la cuenta de destino:");

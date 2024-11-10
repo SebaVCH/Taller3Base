@@ -9,9 +9,9 @@ public interface sistema {
     // Funciones de usuario
     void mostrarOpcionesCliente(String email);
     void realizarOperacion(String email);
-    void realizarDeposito();
-    void realizarRetiro();
-    void realizarTransferencia();
+    void realizarDeposito(String email);
+    void realizarRetiro(String email);
+    void realizarTransferencia(String email);
     void consultarSaldo(String email);
 
     // Funciones de administrador
