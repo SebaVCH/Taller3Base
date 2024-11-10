@@ -165,21 +165,154 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void realizarOperacion(String email) {
-
+        System.out.println("Seleccione el tipo de operación que desea realizar:");
+        System.out.println("1) Depósito");
+        System.out.println("2) Retiro");
+        System.out.println("3) Transferencia");
+        System.out.print(">> ");
+    
+        int opcion = Integer.parseInt(sc.nextLine());
+    
+        switch (opcion) {
+            case 1:
+                realizarDeposito(email);
+                break;
+            case 2:
+                realizarRetiro(email);
+                break;
+            case 3:
+                realizarTransferencia(email);
+                break;
+            default:
+                System.out.println("Opción inválida, intente de nuevo.");
+                realizarOperacion(email); 
+        }
     }
 
     @Override
     public void realizarDeposito() {
 
+        System.out.println("Ingrese el ID de la cuenta para realizar el depósito:");
+        int idCuenta = Integer.parseInt(sc.nextLine());
+        System.out.println("Ingrese el monto a depositar:");
+        int monto = Integer.parseInt(sc.nextLine());
+
+        if (monto <= 0) {
+            System.out.println("El monto debe ser positivo.");
+            return;
+        }
+
+        DatabaseConnection dbConnection = new DatabaseConnection();
+
+        try (Connection conn = dbConnection.getConnection()) {
+            if (conn != null) {
+                
+                PreparedStatement stmt = conn.prepareStatement(
+                        "UPDATE CuentaBancaria SET saldo = saldo + ? WHERE idCuenta = ?");
+                stmt.setInt(1, monto);
+                stmt.setInt(2, idCuenta);
+                stmt.executeUpdate();
+
+                
+                PreparedStatement operacionStmt = conn.prepareStatement(
+                        "INSERT INTO Operacion (idCuentaOrigen, tipoOperacion, monto, fechaOperacion) " +
+                        "VALUES (?, 'DEPOSITO', ?, current_date)");
+                operacionStmt.setInt(1, idCuenta);
+                operacionStmt.setInt(2, monto);
+                operacionStmt.executeUpdate();
+
+                System.out.println("Depósito realizado exitosamente.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al realizar el depósito: " + e.getMessage());
+        }
+
     }
 
     @Override
     public void realizarRetiro() {
+        System.out.println("Ingrese el ID de la cuenta para realizar el retiro:");
+        int idCuenta = Integer.parseInt(sc.nextLine());
+        System.out.println("Ingrese el monto a retirar:");
+        int monto = Integer.parseInt(sc.nextLine());
 
+        if (monto <= 0) {
+            System.out.println("El monto debe ser positivo.");
+            return;
+        }
+
+        DatabaseConnection dbConnection = new DatabaseConnection();
+
+        try (Connection conn = dbConnection.getConnection()) {
+            if (conn != null) {
+            
+                PreparedStatement stmtSaldo = conn.prepareStatement(
+                        "SELECT saldo FROM CuentaBancaria WHERE idCuenta = ?");
+                stmtSaldo.setInt(1, idCuenta);
+                ResultSet rs = stmtSaldo.executeQuery();
+
+                if (rs.next()) {
+                    int saldoActual = rs.getInt("saldo");
+
+                    if (saldoActual < monto) {
+                        System.out.println("Fondos insuficientes para realizar el retiro.");
+                        return;
+                    }
+
+                    
+                    PreparedStatement stmtRetiro = conn.prepareStatement(
+                            "UPDATE CuentaBancaria SET saldo = saldo - ? WHERE idCuenta = ?");
+                    stmtRetiro.setInt(1, monto);
+                    stmtRetiro.setInt(2, idCuenta);
+                    stmtRetiro.executeUpdate();
+
+                    
+                    PreparedStatement operacionStmt = conn.prepareStatement(
+                            "INSERT INTO Operacion (idCuentaOrigen, tipoOperacion, monto, fechaOperacion) " +
+                            "VALUES (?, 'RETIRO', ?, current_date)");
+                    operacionStmt.setInt(1, idCuenta);
+                    operacionStmt.setInt(2, monto);
+                    operacionStmt.executeUpdate();
+
+                    System.out.println("Retiro realizado exitosamente.");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al realizar el retiro: " + e.getMessage());
+        }
     }
 
     @Override
     public void realizarTransferencia() {
+        System.out.println("Ingrese el ID de la cuenta de origen:");
+        int idCuentaOrigen = Integer.parseInt(sc.nextLine());
+        System.out.println("Ingrese el ID de la cuenta de destino:");
+        int idCuentaDestino = Integer.parseInt(sc.nextLine());
+        System.out.println("Ingrese el monto a transferir:");
+        int monto = Integer.parseInt(sc.nextLine());
+
+        if (monto <= 0) {
+            System.out.println("El monto debe ser positivo.");
+            return;
+        }
+
+        DatabaseConnection dbConnection = new DatabaseConnection();
+
+        try (Connection conn = dbConnection.getConnection()) {
+            if (conn != null) {
+            
+                allableStatement stmt = conn.prepareCall("{CALL transferirFondos(?, ?, ?)}");
+                stmt.setInt(1, idCuentaOrigen);
+                stmt.setInt(2, idCuentaDestino);
+                stmt.setInt(3, monto);
+            
+                stmt.execute();
+
+                System.out.println("Transferencia realizada exitosamente.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al realizar la transferencia: " + e.getMessage());
+        }
 
     }
 
