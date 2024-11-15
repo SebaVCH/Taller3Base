@@ -143,50 +143,61 @@ public class sistemaIMPL implements sistema{
     @Override
     public void mostrarOpcionesCliente(String email) {
 
-        System.out.println("Bienvenido! Seleccione una opcion:");
-        System.out.println("\n 1) Realizar una operacion \n 2) Abrir una cuenta nueva: \n 3) Consultar Saldo:");
-        int opcion = Integer.parseInt(sc.nextLine());
-        switch (opcion){
-            case 1:
-                realizarOperacion(email);
-                break;
-            case 2:
-                abrirCuentaBancaria(email);
-                break;
-            case 3:
-                consultarSaldo(email);
-                break;
-            default:
-                System.out.println("Ingrese una opcion valida...");
-                break;
-        }
-
+        do {
+            System.out.println("Bienvenido! Seleccione una opcion:");
+            System.out.println("\n 1) Realizar una operacion \n 2) Abrir una cuenta nueva \n 3) Consultar Saldo");
+            System.out.print(">> ");
+            int opcion = Integer.parseInt(sc.nextLine());
+            switch (opcion){
+                case 1:
+                    realizarOperacion(email);
+                    break;
+                case 2:
+                    abrirCuentaBancaria(email);
+                    break;
+                case 3:
+                    consultarSaldo(email);
+                    break;
+                case 0:
+                    System.out.println("Saliendo del sistema...");
+                    return;
+                default:
+                    System.out.println("Ingrese una opcion valida...");
+                    break;
+            }
+        } while (true);
     }
 
     @Override
     public void realizarOperacion(String email) {
-        System.out.println("Seleccione el tipo de operación que desea realizar:");
-        System.out.println("1) Depósito");
-        System.out.println("2) Retiro");
-        System.out.println("3) Transferencia");
-        System.out.print(">> ");
-    
-        int opcion = Integer.parseInt(sc.nextLine());
-    
-        switch (opcion) {
-            case 1:
-                realizarDeposito(email);
-                break;
-            case 2:
-                realizarRetiro(email);
-                break;
-            case 3:
-                realizarTransferencia(email);
-                break;
-            default:
-                System.out.println("Opción inválida, intente de nuevo.");
-                realizarOperacion(email); 
-        }
+        do {
+            System.out.println("Seleccione el tipo de operación que desea realizar:");
+            System.out.println("1) Depósito");
+            System.out.println("2) Retiro");
+            System.out.println("3) Transferencia");
+            System.out.println("0) Salir");
+            System.out.print(">> ");
+
+            int opcion = Integer.parseInt(sc.nextLine());
+
+            switch (opcion) {
+                case 1:
+                    realizarDeposito(email);
+                    break;
+                case 2:
+                    realizarRetiro(email);
+                    break;
+                case 3:
+                    realizarTransferencia(email);
+                    break;
+                case 0:
+                    System.out.println("");
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+                    realizarOperacion(email);
+            }
+        } while (true);
     }
 
     @Override
@@ -238,7 +249,6 @@ public class sistemaIMPL implements sistema{
         }
     }
 
-
     @Override
     public void realizarRetiro(String email) {
         DatabaseConnection dbConnection = new DatabaseConnection();
@@ -265,7 +275,6 @@ public class sistemaIMPL implements sistema{
                     System.out.println("El monto debe ser positivo.");
                     return;
                 }
-
             
                 PreparedStatement stmtSaldo = conn.prepareStatement(
                         "SELECT saldo FROM CuentaBancaria WHERE idCuenta = ?");
@@ -279,14 +288,12 @@ public class sistemaIMPL implements sistema{
                         System.out.println("Fondos insuficientes para realizar el retiro.");
                         return;
                     }
-
                 
                     PreparedStatement stmtRetiro = conn.prepareStatement(
                             "UPDATE CuentaBancaria SET saldo = saldo - ? WHERE idCuenta = ?");
                     stmtRetiro.setInt(1, monto);
                     stmtRetiro.setInt(2, idCuenta);
                     stmtRetiro.executeUpdate();
-
                 
                     PreparedStatement operacionStmt = conn.prepareStatement(
                             "INSERT INTO Operacion (idCuentaOrigen, tipoOperacion, monto, fechaOperacion) " +
@@ -302,7 +309,6 @@ public class sistemaIMPL implements sistema{
             System.err.println("Error al realizar el retiro: " + e.getMessage());
         }
     }
-
 
     @Override
     public void realizarTransferencia(String email) {
@@ -347,7 +353,7 @@ public class sistemaIMPL implements sistema{
                     return;
                 }
 
-                CallableStatement stmtTransferencia = conn.prepareCall("{CALL transferirFondos(?, ?, ?)}");
+                CallableStatement stmtTransferencia = conn.prepareCall("CALL transferirFondos(?, ?, ?)");
                 stmtTransferencia.setInt(1, idCuentaOrigen);
                 stmtTransferencia.setInt(2, idCuentaDestino);
                 stmtTransferencia.setInt(3, monto);
@@ -359,7 +365,6 @@ public class sistemaIMPL implements sistema{
             System.err.println("Error al realizar la transferencia: " + e.getMessage());
         }
     }
-
 
     @Override
     public void consultarSaldo(String email) {
@@ -389,38 +394,39 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void mostrarOpcionesAdministrador() {
-        System.out.println("Opciones del Administrador:");
-        System.out.println("1) Consultar Historial de Transacciones");
-        System.out.println("2) Generar Reporte Financiero");
-        System.out.println("3) Vista de Cuentas Inactivas");
-        System.out.println("4) Configuración de Usuarios");
-        System.out.println("5) Salir");
+        do {
+            System.out.println("Opciones del Administrador:");
+            System.out.println("1) Consultar Historial de Transacciones");
+            System.out.println("2) Generar Reporte Financiero");
+            System.out.println("3) Vista de Cuentas Inactivas");
+            System.out.println("4) Configuración de Usuarios");
+            System.out.println("0) Salir");
+            System.out.print(">> ");
 
-        int opcion = Integer.parseInt(sc.nextLine());
+            int opcion = Integer.parseInt(sc.nextLine());
 
-        switch (opcion) {
-            case 1:
-                consultarHistorialTransacciones();
-                break;
-            case 2:
-                generarReporteFinanciero();
-                break;
-            case 3:
-                verCuentasInactivas();
-                break;
-            case 4:
-                configurarUsuarios();
-                break;
-            case 5:
-                System.out.println("Saliendo del sistema...");
-                break;
-            default:
-                System.out.println("Opción inválida. Por favor, seleccione una opción válida.");
-                mostrarOpcionesAdministrador();
-                break;
-        }
+            switch (opcion) {
+                case 1:
+                    consultarHistorialTransacciones();
+                    break;
+                case 2:
+                    generarReporteFinanciero();
+                    break;
+                case 3:
+                    verCuentasInactivas();
+                    break;
+                case 4:
+                    configurarUsuarios();
+                    break;
+                case 0:
+                    System.out.println("Saliendo del sistema...");
+                    return;
+                default:
+                    System.out.println("Opción inválida. Por favor, seleccione una opción válida.");
+                    break;
+            }
+        } while (true);
     }
-
 
     @Override
     public void consultarHistorialTransacciones() {
@@ -456,7 +462,6 @@ public class sistemaIMPL implements sistema{
                     System.out.println("Opción inválida.");
                     return;
                 }
-
                 
                 ResultSet rs = stmt.executeQuery();
                 System.out.println("Historial de Transacciones:");
@@ -476,14 +481,12 @@ public class sistemaIMPL implements sistema{
         }
     }
 
-
     @Override
     public void generarReporteFinanciero() {
         DatabaseConnection dbConnection = new DatabaseConnection();
 
         try (Connection conn = dbConnection.getConnection()) {
             if (conn != null) {
-
                
                 String saldoPromedioQuery = "SELECT AVG(saldo) AS saldo_promedio FROM cuentabancaria";
                 PreparedStatement saldoPromStmt = conn.prepareStatement(saldoPromedioQuery);
@@ -491,7 +494,6 @@ public class sistemaIMPL implements sistema{
                 if (rsSaldoProm.next()) {
                     System.out.println("Saldo promedio de las cuentas: $" + rsSaldoProm.getDouble("saldo_promedio"));
                 }
-
                 
                 String cuentasTransaccionesQuery = 
                     "SELECT id_cuenta_origen AS id_cuenta, COUNT(*) AS transacciones " +
@@ -507,7 +509,6 @@ public class sistemaIMPL implements sistema{
                     System.out.println("Número de Transacciones: " + rsCuentasTrans.getInt("transacciones"));
                     System.out.println("---------------------------------");
                 }
-
                 
                 String ingresosNetosQuery = 
                     "SELECT " +
@@ -523,16 +524,161 @@ public class sistemaIMPL implements sistema{
         } catch (SQLException e) {
             System.err.println("Error al generar el reporte financiero: " + e.getMessage());
         }
-    }   
-
+    }
 
     @Override
     public void verCuentasInactivas() {
+        DatabaseConnection dbConnection = new DatabaseConnection();
+        System.out.println("Ingrese los cantidad de dias de inactividad por los que desea filtrar las cuentas inactivas:");
+        System.out.print(">> ");
+        int diasInactividad = Integer.parseInt(sc.nextLine());
+        try {
+            if (dbConnection.getConnection() != null) {
+                Statement stmt = dbConnection.getConnection().createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT CB.idCuenta, CB.email, CB.saldo, CB.fechaCreacion\n" +
+                        "FROM CuentaBancaria CB\n" +
+                        "WHERE NOT EXISTS (\n" +
+                        "    SELECT 1\n" +
+                        "    FROM Operacion O\n" +
+                        "    WHERE (O.idCuentaOrigen = CB.idCuenta OR O.idCuentaDestino = CB.idCuenta)\n" +
+                        "      AND O.fechaOperacion BETWEEN CURRENT_DATE - INTERVAL '" + diasInactividad + " days' AND CURRENT_DATE\n" +
+                        "); ");
 
+                System.out.println("Las cuentas inactivas en un plazo de " + diasInactividad + " dias son: ");
+                while (rs.next()) {
+                    System.out.println("ID: " + rs.getInt("idCuenta"));
+                    System.out.println("Saldo: $" + rs.getInt("saldo"));
+                    System.out.println("Mail: $" + rs.getString("email"));
+                    System.out.println();
+                }
+
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al registrar cliente en la base de datos");
+        }
     }
 
     @Override
     public void configurarUsuarios() {
 
+        do {
+            System.out.println("Opciones del Administrador:");
+            System.out.println("1) Agregar nuevo cliente");
+            System.out.println("2) Modificar un cliente existente");
+            System.out.println("3) Eliminar un cliente");
+            System.out.println("0) Salir");
+            System.out.print(">> ");
+
+            int opcion = Integer.parseInt(sc.nextLine());
+
+            String email = "";
+            if (opcion != 0) {
+                System.out.println("Indique el email de la persona a gestionar: ");
+                System.out.println(">> ");
+                email = sc.nextLine();
+            }
+
+            switch (opcion) {
+                case 1:
+                    registrarCliente(email);
+                    break;
+                case 2:
+                    modificarClienteExistente(email);
+                    break;
+                case 3:
+                    eliminarCliente(email);
+                    break;
+                case 0:
+                    System.out.println("Saliendo del sistema...");
+                    return;
+                default:
+                    System.out.println("Opción inválida. Por favor, seleccione una opción válida.");
+                    break;
+            }
+        } while (true);
+
     }
+
+private void eliminarCliente(String email) {
+    DatabaseConnection dbConnection = new DatabaseConnection();
+
+    try {
+        if (dbConnection.getConnection() != null) {
+
+            PreparedStatement deleteOperacionesStmt = dbConnection.getConnection().prepareStatement(
+                    "DELETE FROM Operacion WHERE id_cuenta_origen IN (SELECT idCuenta FROM CuentaBancaria WHERE email = ?) " +
+                    "OR id_cuenta_destino IN (SELECT idCuenta FROM CuentaBancaria WHERE email = ?)");
+            deleteOperacionesStmt.setString(1, email);
+            deleteOperacionesStmt.setString(2, email);
+            deleteOperacionesStmt.executeUpdate();
+
+            PreparedStatement deleteCuentasStmt = dbConnection.getConnection().prepareStatement(
+                    "DELETE FROM CuentaBancaria WHERE email = ?");
+            deleteCuentasStmt.setString(1, email);
+            deleteCuentasStmt.executeUpdate();
+
+            PreparedStatement deleteClienteStmt = dbConnection.getConnection().prepareStatement(
+                    "DELETE FROM Cliente WHERE email = ?");
+            deleteClienteStmt.setString(1, email);
+            int tuplasAfectadas = deleteClienteStmt.executeUpdate();
+
+            if (tuplasAfectadas > 0) {
+                System.out.println("El cliente y sus datos asociados se han eliminado correctamente.");
+            } else {
+                System.out.println("No se encontró ningún cliente con el email proporcionado.");
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al eliminar al cliente: " + e.getMessage());
+    }
+}
+
+    private void modificarClienteExistente(String email) {
+        DatabaseConnection dbConnection = new DatabaseConnection();
+
+        System.out.println("Ingrese los nuevos datos del cliente (deje vacío para no modificar):");
+        System.out.print("Nombre: ");
+        String nombre = sc.nextLine();
+        System.out.print("Apellido: ");
+        String apellido = sc.nextLine();
+        System.out.print("Contraseña: ");
+        String contrasenia = sc.nextLine();
+
+        try {
+            if (dbConnection.getConnection() != null) {
+                
+                PreparedStatement selectStmt = dbConnection.getConnection().prepareStatement(
+                        "SELECT nombre, apellido, contrasenia FROM Cliente WHERE email = ?");
+                selectStmt.setString(1, email);
+                ResultSet rs = selectStmt.executeQuery();
+
+                if (rs.next()) {
+                    
+                    String nuevoNombre = nombre.isEmpty() ? rs.getString("nombre") : nombre;
+                    String nuevoApellido = apellido.isEmpty() ? rs.getString("apellido") : apellido;
+                    String nuevaContrasenia = contrasenia.isEmpty() ? rs.getString("contrasenia") : contrasenia;
+                    
+                    PreparedStatement updateStmt = dbConnection.getConnection().prepareStatement(
+                            "UPDATE Cliente SET nombre = ?, apellido = ?, contrasenia = ? WHERE email = ?");
+                    updateStmt.setString(1, nuevoNombre);
+                    updateStmt.setString(2, nuevoApellido);
+                    updateStmt.setString(3, nuevaContrasenia);
+                    updateStmt.setString(4, email);
+
+                    int tuplasAfectadas = updateStmt.executeUpdate();
+
+                    if (tuplasAfectadas > 0) {
+                        System.out.println("Los datos del cliente se han modificado correctamente.");
+                    } else {
+                        System.out.println("No se encontró ningún cliente con el email proporcionado.");
+                    }
+                } else {
+                    System.out.println("No se encontró ningún cliente con el email proporcionado.");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al modificar los datos del cliente: " + e.getMessage());
+        }
+    }
+
 }
