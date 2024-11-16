@@ -9,6 +9,17 @@ import java.util.Scanner;
 
 public class sistemaIMPL implements sistema{
 
+    //Singleton sistema
+    private static sistemaIMPL instance;
+    private sistemaIMPL() {}
+
+    public static sistemaIMPL getInstance() {
+        if (instance == null) {
+            instance = new sistemaIMPL();
+        }
+        return instance;
+    }
+
     //Scanner
 
     Scanner sc = new Scanner(System.in);
@@ -57,8 +68,8 @@ public class sistemaIMPL implements sistema{
 
     private Cliente obtenerClientePorMail(String email) {
         Cliente cliente = null;
-
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try {
             if (dbConnection.getConnection() != null) {
@@ -99,7 +110,7 @@ public class sistemaIMPL implements sistema{
     }
     
     private void registrarClienteEnBaseDeDatos(Cliente cliente) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
     
         try {
             if (dbConnection.getConnection() != null) {
@@ -122,7 +133,7 @@ public class sistemaIMPL implements sistema{
     @Override
     public void abrirCuentaBancaria(String email) {
 
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try {
             if (dbConnection.getConnection() != null) {
@@ -202,7 +213,7 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void realizarDeposito(String email) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try (Connection conn = dbConnection.getConnection()) {
             if (conn != null) {
@@ -251,7 +262,7 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void realizarRetiro(String email) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try (Connection conn = dbConnection.getConnection()) {
             if (conn != null) {
@@ -312,7 +323,7 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void realizarTransferencia(String email) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try (Connection conn = dbConnection.getConnection()) {
             if (conn != null) {
@@ -368,7 +379,7 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void consultarSaldo(String email) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try {
             if (dbConnection.getConnection() != null) {
@@ -436,7 +447,7 @@ public class sistemaIMPL implements sistema{
         System.out.print(">> ");
 
         int opcion = Integer.parseInt(sc.nextLine());
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try (Connection conn = dbConnection.getConnection()) {
             if (conn != null) {
@@ -483,7 +494,7 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void generarReporteFinanciero() {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         try (Connection conn = dbConnection.getConnection()) {
             if (conn != null) {
@@ -528,7 +539,7 @@ public class sistemaIMPL implements sistema{
 
     @Override
     public void verCuentasInactivas() {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
         System.out.println("Ingrese los cantidad de dias de inactividad por los que desea filtrar las cuentas inactivas:");
         System.out.print(">> ");
         int diasInactividad = Integer.parseInt(sc.nextLine());
@@ -600,7 +611,7 @@ public class sistemaIMPL implements sistema{
     }
 
 private void eliminarCliente(String email) {
-    DatabaseConnection dbConnection = new DatabaseConnection();
+    DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
     try {
         if (dbConnection.getConnection() != null) {
@@ -634,7 +645,7 @@ private void eliminarCliente(String email) {
 }
 
     private void modificarClienteExistente(String email) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
+        DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
         System.out.println("Ingrese los nuevos datos del cliente (deje vacío para no modificar):");
         System.out.print("Nombre: ");
